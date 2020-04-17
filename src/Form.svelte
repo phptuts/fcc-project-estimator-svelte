@@ -1,23 +1,28 @@
 <script>
-  export let id = 33;
-  export let name = "wood";
-  export let price = 33.33;
+  import materialStore from "./material-store.js";
+  export let id;
+  export let name = "";
+  export let price = 5;
 
   $: mode = id ? "edit" : "add";
   $: canSubmit = price >= 0 && name !== "";
-
+  $: console.log(price);
   function submit() {
     if (!canSubmit) {
       return;
     }
 
-    price = "";
+    if (mode === "add") {
+      materialStore.add(name, price);
+    }
+
     name = "";
+    price = 5;
     id = undefined;
   }
 
   function cancel() {
-    price = "";
+    price = 5;
     name = "";
     id = undefined;
   }
@@ -51,6 +56,7 @@
       id="priceField" />
 
   </fieldset>
+
   <button disabled={!canSubmit} class="float-right" type="submit">
     {mode}
   </button>
