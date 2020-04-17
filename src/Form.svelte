@@ -1,0 +1,60 @@
+<script>
+  export let id = 33;
+  export let name = "wood";
+  export let price = 33.33;
+
+  $: mode = id ? "edit" : "add";
+  $: canSubmit = price >= 0 && name !== "";
+
+  function submit() {
+    if (!canSubmit) {
+      return;
+    }
+
+    price = "";
+    name = "";
+    id = undefined;
+  }
+
+  function cancel() {
+    price = "";
+    name = "";
+    id = undefined;
+  }
+</script>
+
+<style>
+  button {
+    margin-left: 20px;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+</style>
+
+<form on:submit|preventDefault={submit}>
+  <fieldset>
+    <label for="nameField">Material</label>
+    <input
+      bind:value={name}
+      placeholder="Wood, Glue, Etc"
+      type="text"
+      id="nameField" />
+
+    <label for="priceField">Price</label>
+    <input
+      bind:value={price}
+      min="0"
+      step="any"
+      placeholder="Price"
+      type="number"
+      id="priceField" />
+
+  </fieldset>
+  <button disabled={!canSubmit} class="float-right" type="submit">
+    {mode}
+  </button>
+  {#if mode === 'edit'}
+    <button on:click={cancel} class="float-right" type="button">Cancel</button>
+  {/if}
+</form>
