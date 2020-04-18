@@ -1,6 +1,8 @@
 <script>
+  import { createEventDispatcher } from "svelte";
   import materialStore from "./material-store.js";
 
+  const dispatch = createEventDispatcher();
   let materials = [];
 
   materialStore.subscribe(items => {
@@ -12,6 +14,10 @@
     return prev;
   }, 0);
 
+  function edit(id, name, price) {
+    dispatch("edit", { id, name, price });
+  }
+
   const formatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD"
@@ -21,6 +27,9 @@
 <style>
   table {
     width: 100%;
+  }
+  tr {
+    cursor: pointer;
   }
 </style>
 
@@ -34,7 +43,7 @@
   </thead>
   <tbody>
     {#each materials as material (material.id)}
-      <tr>
+      <tr on:click={edit(material.id, material.name, material.price)}>
         <td>{material.name}</td>
         <td>{formatter.format(material.price)}</td>
         <td>
