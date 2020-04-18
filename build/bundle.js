@@ -474,6 +474,9 @@ var app = (function () {
     const edit = (id, name, price) => {
       materialStore.update((items) => {
         const index = items.findIndex((i) => i.id === id);
+        if (index === -1) {
+          return items;
+        }
 
         items[index].name = name;
         items[index].price = price;
@@ -717,7 +720,7 @@ var app = (function () {
     		m(target, anchor, remount) {
     			insert(target, button, anchor);
     			if (remount) dispose();
-    			dispose = listen(button, "click", /*cancel*/ ctx[5]);
+    			dispose = listen(button, "click", /*cancel*/ ctx[6]);
     		},
     		p: noop,
     		d(detaching) {
@@ -747,10 +750,10 @@ var app = (function () {
 
     	function input1_input_handler() {
     		input1_updating = true;
-    		/*input1_input_handler*/ ctx[8].call(input1);
+    		/*input1_input_handler*/ ctx[10].call(input1);
     	}
 
-    	let if_block = /*mode*/ ctx[2] === "edit" && create_if_block(ctx);
+    	let if_block = /*mode*/ ctx[3] === "edit" && create_if_block(ctx);
 
     	return {
     		c() {
@@ -767,7 +770,7 @@ var app = (function () {
     			input1 = element("input");
     			t5 = space();
     			button = element("button");
-    			t6 = text(/*mode*/ ctx[2]);
+    			t6 = text(/*mode*/ ctx[3]);
     			t7 = space();
     			if (if_block) if_block.c();
     			attr(label0, "for", "nameField");
@@ -780,7 +783,7 @@ var app = (function () {
     			attr(input1, "placeholder", "Price");
     			attr(input1, "type", "number");
     			attr(input1, "id", "priceField");
-    			button.disabled = button_disabled_value = !/*canSubmit*/ ctx[3];
+    			button.disabled = button_disabled_value = !/*canSubmit*/ ctx[4];
     			attr(button, "class", "float-right svelte-1chx6tj");
     			attr(button, "type", "submit");
     		},
@@ -795,6 +798,7 @@ var app = (function () {
     			append(fieldset, label1);
     			append(fieldset, t4);
     			append(fieldset, input1);
+    			/*input1_binding*/ ctx[9](input1);
     			set_input_value(input1, /*price*/ ctx[1]);
     			append(form, t5);
     			append(form, button);
@@ -804,9 +808,9 @@ var app = (function () {
     			if (remount) run_all(dispose);
 
     			dispose = [
-    				listen(input0, "input", /*input0_input_handler*/ ctx[7]),
+    				listen(input0, "input", /*input0_input_handler*/ ctx[8]),
     				listen(input1, "input", input1_input_handler),
-    				listen(form, "submit", prevent_default(/*submit*/ ctx[4]))
+    				listen(form, "submit", prevent_default(/*submit*/ ctx[5]))
     			];
     		},
     		p(ctx, [dirty]) {
@@ -819,13 +823,13 @@ var app = (function () {
     			}
 
     			input1_updating = false;
-    			if (dirty & /*mode*/ 4) set_data(t6, /*mode*/ ctx[2]);
+    			if (dirty & /*mode*/ 8) set_data(t6, /*mode*/ ctx[3]);
 
-    			if (dirty & /*canSubmit*/ 8 && button_disabled_value !== (button_disabled_value = !/*canSubmit*/ ctx[3])) {
+    			if (dirty & /*canSubmit*/ 16 && button_disabled_value !== (button_disabled_value = !/*canSubmit*/ ctx[4])) {
     				button.disabled = button_disabled_value;
     			}
 
-    			if (/*mode*/ ctx[2] === "edit") {
+    			if (/*mode*/ ctx[3] === "edit") {
     				if (if_block) {
     					if_block.p(ctx, dirty);
     				} else {
@@ -842,6 +846,7 @@ var app = (function () {
     		o: noop,
     		d(detaching) {
     			if (detaching) detach(form);
+    			/*input1_binding*/ ctx[9](null);
     			if (if_block) if_block.d();
     			run_all(dispose);
     		}
@@ -852,6 +857,7 @@ var app = (function () {
     	let { id } = $$props;
     	let { name = "" } = $$props;
     	let { price = 5 } = $$props;
+    	let inputPrice;
 
     	function submit() {
     		if (!canSubmit) {
@@ -868,18 +874,25 @@ var app = (function () {
 
     		$$invalidate(0, name = "");
     		$$invalidate(1, price = 5);
-    		$$invalidate(6, id = undefined);
+    		$$invalidate(2, inputPrice.value = price, inputPrice);
+    		$$invalidate(7, id = undefined);
     	}
 
     	function cancel() {
     		$$invalidate(1, price = 5);
     		$$invalidate(0, name = "");
-    		$$invalidate(6, id = undefined);
+    		$$invalidate(7, id = undefined);
     	}
 
     	function input0_input_handler() {
     		name = this.value;
     		$$invalidate(0, name);
+    	}
+
+    	function input1_binding($$value) {
+    		binding_callbacks[$$value ? "unshift" : "push"](() => {
+    			$$invalidate(2, inputPrice = $$value);
+    		});
     	}
 
     	function input1_input_handler() {
@@ -888,7 +901,7 @@ var app = (function () {
     	}
 
     	$$self.$set = $$props => {
-    		if ("id" in $$props) $$invalidate(6, id = $$props.id);
+    		if ("id" in $$props) $$invalidate(7, id = $$props.id);
     		if ("name" in $$props) $$invalidate(0, name = $$props.name);
     		if ("price" in $$props) $$invalidate(1, price = $$props.price);
     	};
@@ -897,24 +910,26 @@ var app = (function () {
     	let canSubmit;
 
     	$$self.$$.update = () => {
-    		if ($$self.$$.dirty & /*id*/ 64) {
-    			 $$invalidate(2, mode = id ? "edit" : "add");
+    		if ($$self.$$.dirty & /*id*/ 128) {
+    			 $$invalidate(3, mode = id ? "edit" : "add");
     		}
 
     		if ($$self.$$.dirty & /*price, name*/ 3) {
-    			 $$invalidate(3, canSubmit = price >= 0 && name !== "");
+    			 $$invalidate(4, canSubmit = price >= 0 && name !== "");
     		}
     	};
 
     	return [
     		name,
     		price,
+    		inputPrice,
     		mode,
     		canSubmit,
     		submit,
     		cancel,
     		id,
     		input0_input_handler,
+    		input1_binding,
     		input1_input_handler
     	];
     }
@@ -922,7 +937,7 @@ var app = (function () {
     class Form extends SvelteComponent {
     	constructor(options) {
     		super();
-    		init(this, options, instance$1, create_fragment$1, safe_not_equal, { id: 6, name: 0, price: 1 });
+    		init(this, options, instance$1, create_fragment$1, safe_not_equal, { id: 7, name: 0, price: 1 });
     	}
     }
 
