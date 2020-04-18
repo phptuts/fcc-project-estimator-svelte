@@ -6,7 +6,6 @@
 
   $: mode = id ? "edit" : "add";
   $: canSubmit = price >= 0 && name !== "";
-  $: console.log(price);
   function submit() {
     if (!canSubmit) {
       return;
