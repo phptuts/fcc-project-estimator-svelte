@@ -30,6 +30,12 @@ const edit = (id, name, price) => {
   });
 };
 
+const remove = (id) => {
+  materialStore.update((items) => {
+    return items.filter((i) => i.id !== id);
+  });
+};
+
 materialStore.subscribe((items) => {
   const jsonString = JSON.stringify(items);
   localStorage.setItem(key, jsonString);
@@ -39,4 +45,5 @@ export default {
   subscribe: materialStore.subscribe,
   add,
   edit,
+  remove,
 };
